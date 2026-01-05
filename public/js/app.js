@@ -67,38 +67,80 @@ async function loadCategories() {
             const categoryList = document.getElementById('category-list');
             const filterCategory = document.getElementById('filter-category');
             
-            // Ajouter "Tous"
+            // Liste des catégories par défaut
+            const defaultCategories = [
+                { name: 'Connexion', icon: 'fas fa-sign-in-alt' },
+                { name: 'Déconnexion', icon: 'fas fa-sign-out-alt' },
+                { name: 'Admin', icon: 'fas fa-user-shield' },
+                { name: 'Staff', icon: 'fas fa-user-tie' },
+                { name: 'System', icon: 'fas fa-cog' },
+                { name: 'Chat', icon: 'fas fa-comments' },
+                { name: 'Économie', icon: 'fas fa-dollar-sign' },
+                { name: 'Inventaire', icon: 'fas fa-box' },
+                { name: 'Véhicules', icon: 'fas fa-car' },
+                { name: 'Illégal', icon: 'fas fa-exclamation-triangle' },
+                { name: 'Morts', icon: 'fas fa-skull' },
+                { name: 'Modération', icon: 'fas fa-gavel' },
+                { name: 'Reports', icon: 'fas fa-flag' },
+                { name: 'Boutique', icon: 'fas fa-shopping-cart' },
+                { name: 'Entreprises', icon: 'fas fa-building' }
+            ];
+
+            // Créer un map des catégories avec leurs counts
+            const categoryMap = {};
+            let total = 0;
+            categories.forEach(cat => {
+                categoryMap[cat.category.toLowerCase()] = cat.count;
+                total += cat.count;
+            });
+
+            // Construire le HTML
             let html = `
                 <div class="category-item active" data-category="all" onclick="selectCategory('all')">
                     <i class="fas fa-list"></i>
                     <span>Tous</span>
-                    <span class="count" id="count-all">0</span>
+                    <span class="count">${total}</span>
                 </div>
             `;
 
-            // Calculer le total
-            let total = 0;
-            categories.forEach(cat => {
-                total += cat.count;
-            });
-            document.getElementById('count-all').textContent = total;
-
-            // Ajouter les catégories
-            categories.forEach(cat => {
-                const icon = getCategoryIcon(cat.category);
+            // Ajouter toutes les catégories par défaut
+            defaultCategories.forEach(cat => {
+                const catName = cat.name.toLowerCase();
+                const count = categoryMap[catName] || 0;
+                
                 html += `
-                    <div class="category-item" data-category="${cat.category}" onclick="selectCategory('${cat.category}')">
-                        <i class="${icon}"></i>
-                        <span>${cat.category}</span>
-                        <span class="count">${cat.count}</span>
+                    <div class="category-item" data-category="${catName}" onclick="selectCategory('${catName}')">
+                        <i class="${cat.icon}"></i>
+                        <span>${cat.name}</span>
+                        <span class="count">${count}</span>
                     </div>
                 `;
 
                 // Ajouter au filtre
                 const option = document.createElement('option');
-                option.value = cat.category;
-                option.textContent = cat.category;
+                option.value = catName;
+                option.textContent = cat.name;
                 filterCategory.appendChild(option);
+            });
+
+            // Ajouter les catégories custom qui ne sont pas dans la liste par défaut
+            categories.forEach(cat => {
+                const catName = cat.category.toLowerCase();
+                if (!defaultCategories.find(dc => dc.name.toLowerCase() === catName)) {
+                    const icon = getCategoryIcon(cat.category);
+                    html += `
+                        <div class="category-item" data-category="${catName}" onclick="selectCategory('${catName}')">
+                            <i class="${icon}"></i>
+                            <span>${cat.category}</span>
+                            <span class="count">${cat.count}</span>
+                        </div>
+                    `;
+
+                    const option = document.createElement('option');
+                    option.value = catName;
+                    option.textContent = cat.category;
+                    filterCategory.appendChild(option);
+                }
             });
 
             categoryList.innerHTML = html;
