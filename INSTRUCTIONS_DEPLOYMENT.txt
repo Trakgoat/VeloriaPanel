@@ -1,0 +1,172 @@
+# 🚀 DÉPLOIEMENT RAILWAY - INSTRUCTIONS SIMPLES
+
+## ✅ Ce qui est déjà fait :
+- ✅ Application Discord configurée
+- ✅ Ton Discord ID ajouté
+- ✅ Fichiers prêts pour Railway
+
+## 📋 ÉTAPE 1 : Créer un compte Railway (2 min)
+
+1. Va sur : **https://railway.app**
+2. Clique **"Start a New Project"**
+3. Connecte-toi avec **GitHub** (crée un compte si besoin)
+
+## 📋 ÉTAPE 2 : Déployer le Panel (5 min)
+
+### Option A : Avec GitHub (recommandé)
+
+1. Va sur GitHub et crée un nouveau repository
+2. Upload tous les fichiers du dossier `panel-veloria`
+3. Sur Railway, clique **"New Project"** → **"Deploy from GitHub repo"**
+4. Sélectionne ton repository
+5. Railway détecte automatiquement Node.js et démarre !
+
+### Option B : Avec Railway CLI (plus rapide)
+
+Ouvre PowerShell dans le dossier panel-veloria :
+
+```powershell
+# Installer Railway CLI
+npm install -g @railway/cli
+
+# Se connecter
+railway login
+
+# Créer le projet
+railway init
+
+# Déployer
+railway up
+```
+
+## 📋 ÉTAPE 3 : Ajouter MySQL (2 min)
+
+1. Dans ton projet Railway, clique **"+ New"**
+2. Choisis **"Database"** → **"Add MySQL"**
+3. Clique sur **MySQL** dans ton projet
+4. Va dans **"Variables"** et copie :
+   - `MYSQLHOST`
+   - `MYSQLUSER` 
+   - `MYSQLPASSWORD`
+   - `MYSQLPORT`
+   - `MYSQLDATABASE`
+
+## 📋 ÉTAPE 4 : Configurer les variables (3 min)
+
+1. Clique sur ton **service web** (pas MySQL)
+2. Va dans **"Variables"**
+3. Colle ces variables (remplace les XXX par les infos MySQL) :
+
+```
+PORT=3000
+NODE_ENV=production
+
+DISCORD_CLIENT_ID=1454260623478227035
+DISCORD_CLIENT_SECRET=J7YXf0vSMgSop0pdeaW3j6dzecTxYUqA
+DISCORD_CALLBACK_URL=https://TON_URL.up.railway.app/auth/discord/callback
+
+SESSION_SECRET=veloria_session_secret_2026_timeo_rmz_logs_security_key_random
+API_KEY=veloria_api_key_fivem_2026_secure_rmz
+
+DB_HOST=COPIE_MYSQLHOST_ICI
+DB_USER=COPIE_MYSQLUSER_ICI
+DB_PASSWORD=COPIE_MYSQLPASSWORD_ICI
+DB_NAME=COPIE_MYSQLDATABASE_ICI
+DB_PORT=COPIE_MYSQLPORT_ICI
+
+ALLOWED_DISCORD_IDS=921890319644102666
+```
+
+4. Clique **"Save"**
+
+## 📋 ÉTAPE 5 : Obtenir l'URL du panel (1 min)
+
+1. Dans ton service web, va dans **"Settings"**
+2. Scroll jusqu'à **"Domains"**
+3. Clique **"Generate Domain"**
+4. Tu auras une URL comme : `panel-veloria-production.up.railway.app`
+5. **COPIE CETTE URL !**
+
+## 📋 ÉTAPE 6 : Mettre à jour Discord (1 min)
+
+1. Va sur https://discord.com/developers/applications
+2. Clique sur ton application
+3. Va dans **"OAuth2"** → **"Redirects"**
+4. **CHANGE** l'URL par : `https://TON_URL_RAILWAY.up.railway.app/auth/discord/callback`
+5. Supprime l'ancienne URL localhost
+6. **Save Changes**
+
+## 📋 ÉTAPE 7 : Importer la base de données (2 min)
+
+Tu as 2 options :
+
+### Option A : Avec Railway CLI
+```powershell
+cd panel-veloria
+railway login
+railway link
+railway run mysql -u root -p < database.sql
+```
+
+### Option B : Avec MySQL Workbench
+1. Dans Railway, clique sur MySQL
+2. Clique **"Connect"**
+3. Ouvre MySQL Workbench
+4. Nouvelle connexion avec les infos Railway
+5. Importe le fichier `database.sql`
+
+## 📋 ÉTAPE 8 : Configurer FiveM (2 min)
+
+1. Upload le dossier `veloria-logs` dans ton FTP → `resources/`
+
+2. Édite `veloria-logs/config.lua` :
+```lua
+Config.PanelURL = "https://TON_URL_RAILWAY.up.railway.app/api/logs"
+Config.APIKey = "veloria_api_key_fivem_2026_secure_rmz"
+```
+
+3. Dans ton `server.cfg` :
+```
+ensure veloria-logs
+```
+
+4. Restart ton serveur FiveM
+
+## 🎉 ÉTAPE 9 : Tester !
+
+1. Va sur ton URL Railway : `https://ton-url.up.railway.app`
+2. Clique **"Se connecter avec Discord"**
+3. Autorise l'application
+4. Tu devrais voir le panel ! 🎊
+
+5. Connecte-toi à ton serveur FiveM
+6. Les logs apparaissent automatiquement !
+
+---
+
+## 🆘 Besoin d'aide ?
+
+**Railway ne démarre pas ?**
+- Vérifie que toutes les variables sont remplies
+- Vérifie les logs dans Railway (onglet "Deployments")
+
+**"Non autorisé" sur Discord ?**
+- Vérifie que ton Discord ID est dans ALLOWED_DISCORD_IDS
+- Vérifie que l'URL callback est correcte
+
+**Pas de logs ?**
+- Vérifie l'API_KEY (identique dans Railway et config.lua)
+- Vérifie l'URL dans config.lua
+
+---
+
+## 📌 Pour ajouter ton staff
+
+1. Ils activent le mode développeur Discord
+2. Ils te donnent leur Discord ID
+3. Dans Railway → Variables → ALLOWED_DISCORD_IDS
+4. Ajoute : `921890319644102666,id_staff1,id_staff2`
+
+---
+
+DIS-MOI À QUELLE ÉTAPE TU EN ES ! 🚀

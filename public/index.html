@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Veloria - Logs Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Écran de connexion -->
+    <div id="login-screen" class="login-container">
+        <div class="login-card">
+            <div class="discord-icon">
+                <svg width="124" height="96" viewBox="0 0 124 96" fill="none">
+                    <path d="M104.4 13.4C96.4 9.6 87.8 7 78.9 5.4C77.7 7.5 76.3 10.3 75.3 12.5C65.9 11.1 56.6 11.1 47.3 12.5C46.3 10.3 44.9 7.5 43.6 5.4C34.7 7 26.1 9.6 18.1 13.5C2.6 36.5 -1.6 59 0.5 81.2C10.8 88.9 20.8 93.7 30.6 96.8C33.1 93.3 35.3 89.6 37.1 85.6C33.3 84.2 29.7 82.4 26.2 80.3C27.1 79.6 28 78.9 28.8 78.2C48.5 87.1 70.1 87.1 89.5 78.2C90.4 78.9 91.3 79.6 92.2 80.3C88.7 82.4 85 84.2 81.2 85.7C83 89.7 85.2 93.4 87.7 96.9C97.6 93.8 107.6 88.9 117.9 81.3C120.4 55.5 113.5 32.2 104.4 13.4ZM41.3 66.8C35.2 66.8 30.2 61.2 30.2 54.3C30.2 47.4 35.1 41.8 41.3 41.8C47.5 41.8 52.5 47.4 52.4 54.3C52.4 61.2 47.5 66.8 41.3 66.8ZM81.1 66.8C75 66.8 70 61.2 70 54.3C70 47.4 74.9 41.8 81.1 41.8C87.3 41.8 92.3 47.4 92.2 54.3C92.2 61.2 87.3 66.8 81.1 66.8Z" fill="#5865F2"/>
+                </svg>
+            </div>
+            <h1>Connexion requise</h1>
+            <p>Connectez-vous avec Discord pour accéder aux logs</p>
+            <button class="discord-button" onclick="loginWithDiscord()">
+                <i class="fab fa-discord"></i> Se connecter avec Discord
+            </button>
+        </div>
+    </div>
+
+    <!-- Interface principale -->
+    <div id="main-app" style="display: none;">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><i class="fas fa-shield-alt"></i> Panel Veloria</h1>
+                </div>
+                <div class="user-info">
+                    <span id="username"></span>
+                    <button class="btn-logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-content">
+                <h3>CATÉGORIES DE LOGS</h3>
+                <div class="category-list" id="category-list">
+                    <div class="category-item active" data-category="all">
+                        <i class="fas fa-list"></i>
+                        <span>Tous</span>
+                        <span class="count" id="count-all">0</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Filtres -->
+            <div class="filters-card">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>TITRE</label>
+                        <input type="text" id="filter-title" placeholder="Rechercher par titre...">
+                    </div>
+                    <div class="filter-group">
+                        <label>MESSAGE</label>
+                        <input type="text" id="filter-message" placeholder="Rechercher par message...">
+                    </div>
+                    <div class="filter-group">
+                        <label>ID UNIQUE</label>
+                        <input type="text" id="filter-unique-id" placeholder="ID Unique...">
+                    </div>
+                    <div class="filter-group">
+                        <label>NOM</label>
+                        <input type="text" id="filter-name" placeholder="Nom du joueur...">
+                    </div>
+                </div>
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label>CATÉGORIE</label>
+                        <select id="filter-category">
+                            <option value="all">Toutes les catégories</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>DATE DÉBUT</label>
+                        <input type="date" id="filter-date-start">
+                    </div>
+                    <div class="filter-group">
+                        <label>DATE FIN</label>
+                        <input type="date" id="filter-date-end">
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn-filter" onclick="applyFilters()">
+                            <i class="fas fa-filter"></i> Filtrer
+                        </button>
+                        <button class="btn-reset" onclick="resetFilters()">
+                            <i class="fas fa-redo"></i> Réinitialiser
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tableau des logs -->
+            <div class="logs-card">
+                <div class="logs-header">
+                    <h2>Logs du serveur</h2>
+                    <div class="logs-stats">
+                        <span>Total: <strong id="total-logs">0</strong></span>
+                        <span>Aujourd'hui: <strong id="today-logs">0</strong></span>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="logs-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>CATÉGORIE</th>
+                                <th>TYPE</th>
+                                <th>MESSAGE</th>
+                                <th>JOUEUR</th>
+                                <th>ID UNIQUE</th>
+                                <th>DATE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-tbody">
+                            <tr>
+                                <td colspan="7" class="loading">
+                                    <i class="fas fa-spinner fa-spin"></i> Chargement des logs...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
