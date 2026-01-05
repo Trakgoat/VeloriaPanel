@@ -338,7 +338,8 @@ app.get('/api/logs/stats', isAuthenticated, async (req, res) => {
 app.listen(PORT, () => {
     console.log(`\n🚀 Panel Veloria démarré sur http://localhost:${PORT}`);
     console.log(`📊 Environnement: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔐 Authentification Discord configurée\n`);
+    console.log(`🔐 Authentification Discord configurée`);
+    console.log(`✅ Serveur prêt à recevoir des connexions\n`);
 });
 
 // Test de connexion à la base de données
