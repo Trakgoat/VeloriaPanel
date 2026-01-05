@@ -4,9 +4,9 @@
   "description": "Panel Veloria - Système de logs pour FiveM",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node setup-db.js && node server.js",
     "dev": "nodemon server.js",
-    "railway": "node server.js"
+    "railway": "node setup-db.js && node server.js"
   },
   "keywords": ["fivem", "logs", "panel"],
   "author": "",
