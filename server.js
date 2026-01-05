@@ -40,7 +40,10 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 24 * 60 * 60 * 1000 // 24 heures
+        maxAge: 24 * 60 * 60 * 1000, // 24 heures
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: 'lax'
     }
 }));
 
@@ -65,12 +68,18 @@ passport.use(new DiscordStrategy({
     scope: ['identify']
 }, async (accessToken, refreshToken, profile, done) => {
     try {
+        console.log('🔐 Tentative de connexion Discord:', profile.username, 'ID:', profile.id);
+        
         // Vérifier si l'utilisateur est autorisé
-        const allowedIds = process.env.ALLOWED_DISCORD_IDS?.split(',') || [];
+        const allowedIds = process.env.ALLOWED_DISCORD_IDS?.split(',').map(id => id.trim()) || [];
+        console.log('👥 IDs autorisés:', allowedIds);
         
         if (!allowedIds.includes(profile.id)) {
+            console.log('❌ Utilisateur non autorisé:', profile.id);
             return done(null, false, { message: 'Non autorisé' });
         }
+
+        console.log('✅ Utilisateur autorisé, enregistrement...');
 
         // Enregistrer ou mettre à jour l'utilisateur
         await pool.query(
@@ -81,8 +90,10 @@ passport.use(new DiscordStrategy({
         );
 
         const [rows] = await pool.query('SELECT * FROM authorized_users WHERE discord_id = ?', [profile.id]);
+        console.log('✅ Connexion réussie pour:', profile.username);
         return done(null, rows[0]);
     } catch (error) {
+        console.error('❌ Erreur lors de l\'authentification:', error);
         return done(error, null);
     }
 }));
