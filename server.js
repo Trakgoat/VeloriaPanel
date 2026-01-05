@@ -26,8 +26,9 @@ const dbConfig = {
 const pool = mysql.createPool(dbConfig);
 
 // Middleware
+app.set('trust proxy', 1); // Trust Railway proxy
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' ? 'https://votre-domaine.com' : 'http://localhost:3000',
+    origin: process.env.NODE_ENV === 'production' ? 'https://veloriapanel-production.up.railway.app' : 'http://localhost:3000',
     credentials: true
 }));
 app.use(bodyParser.json());
@@ -39,24 +40,29 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: {
         maxAge: 24 * 60 * 60 * 1000, // 24 heures
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
-        sameSite: 'lax'
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     }
 }));
 
 // Configuration Passport Discord
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+    console.log('📝 Serializing user:', user.discord_id);
+    done(null, user.discord_id);
 });
 
 passport.deserializeUser(async (id, done) => {
+    console.log('📖 Deserializing user:', id);
     try {
         const [rows] = await pool.query('SELECT * FROM authorized_users WHERE discord_id = ?', [id]);
+        console.log('✅ User found:', rows[0] ? rows[0].username : 'not found');
         done(null, rows[0] || null);
     } catch (error) {
+        console.error('❌ Deserialize error:', error);
         done(error, null);
     }
 });
