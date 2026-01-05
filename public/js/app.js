@@ -67,34 +67,13 @@ async function loadCategories() {
             const categoryList = document.getElementById('category-list');
             const filterCategory = document.getElementById('filter-category');
             
-            // Liste des catégories par défaut
-            const defaultCategories = [
-                { name: 'Connexion', icon: 'fas fa-sign-in-alt' },
-                { name: 'Déconnexion', icon: 'fas fa-sign-out-alt' },
-                { name: 'Admin', icon: 'fas fa-user-shield' },
-                { name: 'Staff', icon: 'fas fa-user-tie' },
-                { name: 'System', icon: 'fas fa-cog' },
-                { name: 'Chat', icon: 'fas fa-comments' },
-                { name: 'Économie', icon: 'fas fa-dollar-sign' },
-                { name: 'Inventaire', icon: 'fas fa-box' },
-                { name: 'Véhicules', icon: 'fas fa-car' },
-                { name: 'Illégal', icon: 'fas fa-exclamation-triangle' },
-                { name: 'Morts', icon: 'fas fa-skull' },
-                { name: 'Modération', icon: 'fas fa-gavel' },
-                { name: 'Reports', icon: 'fas fa-flag' },
-                { name: 'Boutique', icon: 'fas fa-shopping-cart' },
-                { name: 'Entreprises', icon: 'fas fa-building' }
-            ];
-
-            // Créer un map des catégories avec leurs counts
-            const categoryMap = {};
+            // Calculer le total
             let total = 0;
             categories.forEach(cat => {
-                categoryMap[cat.category.toLowerCase()] = cat.count;
                 total += cat.count;
             });
 
-            // Construire le HTML
+            // Construire le HTML avec "Tous" en premier
             let html = `
                 <div class="category-item active" data-category="all" onclick="selectCategory('all')">
                     <i class="fas fa-list"></i>
@@ -103,44 +82,24 @@ async function loadCategories() {
                 </div>
             `;
 
-            // Ajouter toutes les catégories par défaut
-            defaultCategories.forEach(cat => {
-                const catName = cat.name.toLowerCase();
-                const count = categoryMap[catName] || 0;
+            // Ajouter toutes les catégories qui existent vraiment dans la base
+            categories.forEach(cat => {
+                const icon = getCategoryIcon(cat.category);
+                const catName = cat.category.toLowerCase();
                 
                 html += `
                     <div class="category-item" data-category="${catName}" onclick="selectCategory('${catName}')">
-                        <i class="${cat.icon}"></i>
-                        <span>${cat.name}</span>
-                        <span class="count">${count}</span>
+                        <i class="${icon}"></i>
+                        <span>${cat.category}</span>
+                        <span class="count">${cat.count}</span>
                     </div>
                 `;
 
                 // Ajouter au filtre
                 const option = document.createElement('option');
-                option.value = catName;
-                option.textContent = cat.name;
+                option.value = cat.category;
+                option.textContent = cat.category;
                 filterCategory.appendChild(option);
-            });
-
-            // Ajouter les catégories custom qui ne sont pas dans la liste par défaut
-            categories.forEach(cat => {
-                const catName = cat.category.toLowerCase();
-                if (!defaultCategories.find(dc => dc.name.toLowerCase() === catName)) {
-                    const icon = getCategoryIcon(cat.category);
-                    html += `
-                        <div class="category-item" data-category="${catName}" onclick="selectCategory('${catName}')">
-                            <i class="${icon}"></i>
-                            <span>${cat.category}</span>
-                            <span class="count">${cat.count}</span>
-                        </div>
-                    `;
-
-                    const option = document.createElement('option');
-                    option.value = catName;
-                    option.textContent = cat.category;
-                    filterCategory.appendChild(option);
-                }
             });
 
             categoryList.innerHTML = html;
@@ -155,19 +114,40 @@ function getCategoryIcon(category) {
     const icons = {
         'connexion': 'fas fa-sign-in-alt',
         'deconnexion': 'fas fa-sign-out-alt',
+        'déconnexion': 'fas fa-sign-out-alt',
         'admin': 'fas fa-user-shield',
         'staff': 'fas fa-user-tie',
         'system': 'fas fa-cog',
+        'système': 'fas fa-cog',
         'chat': 'fas fa-comments',
         'economie': 'fas fa-dollar-sign',
+        'économie': 'fas fa-dollar-sign',
         'inventaire': 'fas fa-box',
         'vehicules': 'fas fa-car',
+        'véhicules': 'fas fa-car',
         'illegal': 'fas fa-exclamation-triangle',
+        'illégal': 'fas fa-exclamation-triangle',
         'morts': 'fas fa-skull',
+        'mort': 'fas fa-skull',
+        'death': 'fas fa-skull',
         'moderation': 'fas fa-gavel',
+        'modération': 'fas fa-gavel',
         'reports': 'fas fa-flag',
+        'report': 'fas fa-flag',
         'boutique': 'fas fa-shopping-cart',
-        'entreprises': 'fas fa-building'
+        'shop': 'fas fa-shopping-cart',
+        'entreprises': 'fas fa-building',
+        'entreprise': 'fas fa-building',
+        'job': 'fas fa-briefcase',
+        'jobs': 'fas fa-briefcase',
+        'money': 'fas fa-money-bill',
+        'bank': 'fas fa-university',
+        'weapon': 'fas fa-gun',
+        'arme': 'fas fa-gun',
+        'police': 'fas fa-shield-alt',
+        'ems': 'fas fa-ambulance',
+        'mecano': 'fas fa-wrench',
+        'mécano': 'fas fa-wrench'
     };
 
     return icons[category.toLowerCase()] || 'fas fa-circle';
