@@ -123,10 +123,10 @@ function verifyApiKey(req, res, next) {
 app.get('/auth/discord', passport.authenticate('discord'));
 
 app.get('/auth/discord/callback',
-    passport.authenticate('discord', { failureRedirect: '/login-failed' }),
-    (req, res) => {
-        res.redirect('/');
-    }
+    passport.authenticate('discord', { 
+        failureRedirect: '/login-failed',
+        successRedirect: '/'
+    })
 );
 
 app.get('/login-failed', (req, res) => {
@@ -168,9 +168,12 @@ app.get('/auth/logout', (req, res) => {
 });
 
 app.get('/auth/user', (req, res) => {
+    console.log('🔍 Vérification auth, isAuthenticated:', req.isAuthenticated());
     if (req.isAuthenticated()) {
+        console.log('✅ Utilisateur authentifié:', req.user.username);
         res.json(req.user);
     } else {
+        console.log('❌ Non authentifié');
         res.status(401).json({ error: 'Non authentifié' });
     }
 });
